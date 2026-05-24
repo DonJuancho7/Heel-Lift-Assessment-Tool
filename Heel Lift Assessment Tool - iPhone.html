@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Heel Lift Tool">
+<meta name="theme-color" content="#0f3d7a">
+<title>Heel Lift Assessment</title>
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Heel Lift Clinical Tool&quot;,&quot;short_name&quot;:&quot;HeelLift&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23f4f6f9&quot;,&quot;theme_color&quot;:&quot;%230f3d7a&quot;,&quot;start_url&quot;:&quot;.&quot;}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f9;--surface:#fff;--surface2:#f0f3f7;--border:#dde3ec;--border2:#c8d1df;
+  --text:#1a2233;--text2:#4a5568;--text3:#8a96a8;
+  --accent:#1a5fb4;--accent-light:#e8f0fc;--accent-dark:#0f3d7a;
+  --green:#2d8a4e;--green-light:#eaf7ee;--green-btn:#22863a;--green-hover:#1a6b2e;
+  --red:#c0392b;--red-light:#fdf0ee;
+  --amber:#d97706;--amber-light:#fef3c7;
+  --radius:14px;--radius-sm:10px;--radius-xs:6px;
+  --shadow:0 2px 12px rgba(26,34,51,.08);--shadow-md:0 4px 24px rgba(26,34,51,.12);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  font-size:17px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--safe-bottom) + 16px);
+}
+
+/* HEADER — accounts for Dynamic Island */
+.app-header{
+  background:var(--accent-dark);
+  color:#fff;
+  padding:0 20px;
+  padding-top:var(--safe-top);
+  display:flex;
+  align-items:center;
+  min-height:calc(54px + var(--safe-top));
+  height:calc(54px + var(--safe-top));
+  position:sticky;
+  top:0;
+  z-index:200;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+}
+.app-header-inner{display:flex;align-items:center;gap:10px;}
+.app-logo{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.app-title{font-size:17px;font-weight:600;letter-spacing:-.2px;}
+.app-sub{font-size:12px;opacity:.55;font-weight:300;margin-left:6px;}
+
+/* TABS */
+.tab-bar{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  padding:0 16px;
+  position:sticky;
+  top:calc(54px + var(--safe-top));
+  z-index:100;
+  box-shadow:0 1px 4px rgba(26,34,51,.05);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.tab-btn{
+  padding:15px 16px;
+  border:none;
+  background:none;
+  color:var(--text2);
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  border-bottom:3px solid transparent;
+  transition:all .15s;
+  margin-bottom:-1px;
+  white-space:nowrap;
+  min-height:50px;
+}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-btn:hover:not(.active){color:var(--text);background:var(--bg);}
+
+/* PAGES */
+.page{display:none;padding:20px 16px 60px;max-width:860px;margin:0 auto;}
+.page.active{display:block;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px;margin-bottom:16px;box-shadow:var(--shadow);}
+.card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;display:inline-block;}
+
+/* LAYOUT */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.full-col{grid-column:1/-1;}
+
+/* LISTING BLOCK */
+.listing-block{border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface2);transition:border-color .2s;}
+.listing-block:focus-within{border-color:var(--accent);background:#fff;}
+.listing-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.listing-block-label{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.listing-side-badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.badge-left{background:#e8f4fd;color:#1a5fb4;}
+.badge-right{background:#eaf7ee;color:#2d8a4e;}
+.listing-preview{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--accent);background:var(--accent-light);padding:4px 10px;border-radius:20px;letter-spacing:.5px;min-width:70px;text-align:center;}
+.listing-preview.empty{color:var(--text3);background:var(--border);font-weight:400;}
+
+/* FORM FIELDS */
+.field-group{display:flex;flex-direction:column;gap:6px;}
+.field-label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.3px;text-transform:uppercase;}
+
+/* INPUTS — large touch targets for iPhone */
+input[type="text"],input[type="number"]{
+  width:100%;
+  padding:14px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-family:'DM Mono',monospace;
+  font-size:16px;
+  color:var(--text);
+  background:var(--surface2);
+  transition:border-color .15s,box-shadow .15s;
+  outline:none;
+  -webkit-appearance:none;
+  min-height:50px;
+}
+input[type="text"]{font-family:'DM Sans',sans-serif;}
+input[type="text"]:focus,input[type="number"]:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(26,95,180,.12);
+  background:#fff;
+}
+input[type="text"]::placeholder,input[type="number"]::placeholder{
+  color:var(--text3);
+  font-size:15px;
+}
+select{
+  width:100%;padding:14px 12px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;
+  color:var(--text);
+  background:var(--surface);
+  outline:none;
+  -webkit-appearance:none;
+  min-height:50px;
+}
+
+/* RADIO */
+.radio-opt{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:16px;font-weight:500;min-height:44px;}
+.radio-opt input[type="radio"]{width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+
+/* MD/AD ROW */
+.md-ad-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* SACRAL */
+.sacral-box{background:var(--accent-light);border:1.5px dashed #a8c4e8;border-radius:var(--radius);padding:16px;}
+.sacral-title{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.3px;margin-bottom:12px;}
+.sacral-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.sacral-mm-wrap{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.sacral-mm-wrap input{width:90px;}
+.sacral-mm-wrap span{font-size:14px;color:var(--text2);}
+
+/* SIDE ROW */
+.side-row{display:flex;align-items:center;gap:16px;padding:14px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);flex-wrap:wrap;min-height:54px;}
+.side-label{font-size:14px;color:var(--text2);font-weight:500;}
+.radio-group{display:flex;gap:20px;}
+
+/* BUTTONS */
+.btn-primary{
+  width:100%;padding:17px;
+  background:var(--green-btn);color:#fff;
+  border:none;border-radius:var(--radius);
+  font-family:'DM Sans',sans-serif;
+  font-size:17px;font-weight:600;
+  cursor:pointer;transition:background .15s;
+  letter-spacing:-.1px;margin-top:4px;
+  min-height:56px;
+  -webkit-appearance:none;
+}
+.btn-primary:active{background:var(--green-hover);}
+.btn-secondary{
+  width:100%;padding:15px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:var(--radius);
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;font-weight:600;
+  cursor:pointer;transition:background .15s;
+  margin-top:0;min-height:52px;
+  -webkit-appearance:none;
+}
+.btn-secondary:active{background:var(--accent-dark);}
+.btn-reset{
+  background:none;border:1px solid var(--border2);
+  color:var(--text2);padding:12px 18px;
+  border-radius:var(--radius-sm);
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;cursor:pointer;
+  margin-top:12px;display:block;
+  min-height:48px;width:100%;text-align:center;
+}
+
+/* ERROR */
+.error-msg{display:none;padding:14px 16px;background:var(--red-light);border:1px solid #e8b4ae;color:var(--red);border-radius:var(--radius-sm);font-size:14px;font-weight:500;margin-top:12px;line-height:1.5;}
+.error-msg.visible{display:block;}
+
+/* RESULT */
+.result-section{display:none;margin-top:4px;}
+.result-section.visible{display:block;}
+.result-banner{padding:16px 18px;border-radius:var(--radius);font-size:15px;font-weight:500;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px;line-height:1.5;}
+.result-banner.green{background:var(--green-light);border:1px solid #a3d9b3;color:var(--green);}
+.result-banner.red{background:var(--red-light);border:1px solid #e8b4ae;color:var(--red);}
+.result-banner .icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+
+.ad-display{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;}
+.ad-num{font-family:'DM Mono',monospace;font-size:48px;font-weight:500;color:var(--accent);line-height:1;}
+.ad-unit{font-size:16px;color:var(--text2);}
+.ad-check{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:8px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);white-space:pre-line;line-height:1.8;}
+.verify-note{font-size:13px;margin-top:6px;}
+
+/* MATRIX */
+.matrix-item{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid var(--border);}
+.matrix-item:last-child{border-bottom:none;}
+.matrix-chk{flex-shrink:0;margin-top:2px;}
+.matrix-chk input[type="checkbox"]{width:22px;height:22px;accent-color:var(--green);cursor:pointer;}
+.matrix-chk input[type="checkbox"]:disabled{opacity:.7;}
+.matrix-text{flex:1;}
+.matrix-text strong{display:block;font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.matrix-text span{font-size:14px;color:var(--text2);line-height:1.5;}
+.auto-badge{font-size:10px;font-weight:600;padding:2px 7px;background:var(--accent-light);color:var(--accent);border-radius:20px;letter-spacing:.3px;text-transform:uppercase;margin-left:6px;vertical-align:middle;}
+
+/* SCORE */
+.score-bar{display:flex;align-items:center;gap:14px;margin:16px 0;padding:16px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);}
+.score-fraction{font-family:'DM Mono',monospace;font-size:34px;font-weight:500;color:var(--text);line-height:1;}
+.score-sub{font-size:13px;color:var(--text3);}
+.score-pips{display:flex;gap:5px;margin-left:auto;}
+.pip{width:22px;height:8px;border-radius:4px;background:var(--border);}
+.pip.on{background:var(--green);}
+.pip.off{background:#e8b4ae;}
+
+/* DOSING */
+.dosing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.dosing-item{padding:14px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);border-left:3px solid var(--accent);}
+.dosing-item.warn{border-left-color:var(--amber);}
+.dosing-item.ok{border-left-color:var(--green);}
+.dosing-item label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;}
+.dosing-item .dval{font-size:16px;font-weight:500;color:var(--text);font-family:'DM Mono',monospace;}
+.dosing-item .dsub{font-size:12px;color:var(--text3);margin-top:3px;}
+.dosing-note{font-size:14px;color:var(--text2);line-height:1.7;padding:14px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);border-left:3px solid var(--accent);margin-top:12px;}
+
+/* INFO */
+.info-h2{font-size:19px;font-weight:600;color:var(--accent-dark);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--accent-light);}
+.info-h3{font-size:15px;font-weight:600;color:var(--text);margin:16px 0 6px;}
+.info-p{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
+.info-list{padding-left:20px;}
+.info-list li{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:6px;}
+.formula-box{background:var(--accent-dark);color:#fff;border-radius:var(--radius);padding:16px 18px;font-family:'DM Mono',monospace;font-size:13px;line-height:2;margin:12px 0;}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:600;margin:2px;}
+.pill-green{background:var(--green-light);color:var(--green);}
+.pill-red{background:var(--red-light);color:var(--red);}
+.pill-blue{background:var(--accent-light);color:var(--accent);}
+.pill-amber{background:var(--amber-light);color:var(--amber);}
+
+/* PATIENT BANK */
+.bank-row{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);margin-bottom:10px;cursor:pointer;transition:border-color .15s,background .15s;min-height:72px;}
+.bank-row:active{border-color:var(--accent);background:var(--accent-light);}
+.bank-row-avatar{width:44px;height:44px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bank-row-info{flex:1;min-width:0;}
+.bank-row-name{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bank-row-meta{font-size:13px;color:var(--text3);margin-top:3px;}
+.bank-row-badge{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;flex-shrink:0;}
+.badge-qualify{background:var(--green-light);color:var(--green);}
+.badge-no{background:var(--red-light);color:var(--red);}
+.badge-pending{background:var(--amber-light);color:var(--amber);}
+.detail-row{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.detail-row:last-child{border-bottom:none;}
+.detail-label{color:var(--text2);font-weight:500;}
+.detail-val{color:var(--text);font-family:'DM Mono',monospace;font-size:14px;text-align:right;}
+.detail-section{margin-top:16px;padding-top:14px;border-top:2px solid var(--accent-light);}
+.detail-section-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:10px;}
+.lift-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dark);color:white;padding:8px 16px;border-radius:20px;font-family:'DM Mono',monospace;font-size:18px;font-weight:500;margin-top:6px;}
+
+/* Warnings/save messages */
+.save-banner{padding:14px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="app-logo">⚕</div>
+    <span class="app-title">Heel Lift Assessment</span>
+    <span class="app-sub">Keagan Devoe (Student Intern)</span>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('test',this)">Assessment</button>
+  <button class="tab-btn" onclick="showTab('patients',this)">Patient Bank</button>
+  <button class="tab-btn" onclick="showTab('info',this)">Reference Guide</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ASSESSMENT TAB
+══════════════════════════════════════════ -->
+<div id="page-test" class="page active">
+
+  <!-- PATIENT INFO -->
+  <div class="card" id="patient-info-card">
+    <div class="card-title">Patient Information</div>
+    <div class="two-col" style="gap:14px;">
+      <div class="field-group">
+        <label class="field-label">Patient Name</label>
+        <input autocomplete="off" type="text" id="patient-name" placeholder="e.g. Mary Jane" style="font-family:'DM Sans',sans-serif;font-size:14px;">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Case Number (optional)</label>
+        <input autocomplete="off" type="text" id="patient-case" placeholder="e.g. 00142" oninput="checkCaseNumber()" style="font-family:'DM Sans',sans-serif;font-size:14px;">
+      </div>
+    </div>
+    <div id="case-warning" style="display:none;margin-top:10px;padding:10px 14px;background:var(--amber-light);border:1px solid #f59e0b;color:var(--amber);border-radius:var(--radius-sm);font-size:13px;font-weight:500;">
+      ⚠ This case number is assigned to another patient in the patient bank.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Step 1 — Pelvic Listings</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px;margin:0 auto;">
+      <!-- LEFT LISTING -->
+      <div class="listing-block" id="lb-left">
+        <div class="listing-block-header">
+          <div class="listing-block-label">
+            <span class="listing-side-badge badge-left">Left</span>
+            Pelvic Listing
+          </div>
+          <div class="listing-preview empty" id="preview-left">—</div>
+        </div>
+        <div class="field-group">
+          <input autocomplete="off" type="text" id="left-listing" placeholder="e.g. AS2IN3" maxlength="20"
+            oninput="this.value=this.value.toUpperCase();updatePreviewText('left');autoFillOpposite('left')">
+        </div>
+      </div>
+
+      <!-- RIGHT LISTING -->
+      <div class="listing-block" id="lb-right">
+        <div class="listing-block-header">
+          <div class="listing-block-label">
+            <span class="listing-side-badge badge-right">Right</span>
+            Pelvic Listing
+          </div>
+          <div class="listing-preview empty" id="preview-right">—</div>
+        </div>
+        <div class="field-group">
+          <input autocomplete="off" type="text" id="right-listing" placeholder="e.g. PI3EX2" maxlength="20"
+            oninput="this.value=this.value.toUpperCase();updatePreviewText('right');autoFillOpposite('right')">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SACRAL + MD/AD -->
+  <div class="card" style="margin-top:28px;">
+    <div class="card-title">Step 1 — Measurements</div>
+
+    <div class="sacral-box" style="margin-bottom:14px;">
+      <div class="sacral-title">Sacral Inferiority</div>
+      <div class="sacral-row">
+        <label class="radio-opt"><input autocomplete="off" type="radio" name="sacral" value="left"> Left</label>
+        <label class="radio-opt"><input autocomplete="off" type="radio" name="sacral" value="right"> Right</label>
+        <div class="sacral-mm-wrap">
+          <input autocomplete="off" type="number" id="sacral-mm" placeholder="mm" min="0" max="50" step="1">
+          <span>mm inferior</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="md-ad-row" style="margin-bottom:14px;">
+      <div class="field-group">
+        <label class="field-label">Measured Difference (MD)</label>
+        <input autocomplete="off" type="number" id="md-input" placeholder="Enter mm" min="0" max="80" step="1">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Charted AD — optional verify</label>
+        <input autocomplete="off" type="number" id="ad-input" placeholder="optional" min="0" max="80" step="1">
+      </div>
+    </div>
+
+    <div class="side-row">
+      <span class="side-label">Short leg side (MD/AD):</span>
+      <div class="radio-group">
+        <label class="radio-opt"><input autocomplete="off" type="radio" name="shortleg" value="left"> Left</label>
+        <label class="radio-opt"><input autocomplete="off" type="radio" name="shortleg" value="right"> Right</label>
+      </div>
+    </div>
+  </div>
+
+  <div id="error-msg" class="error-msg">⚠ Please check all inputs — ensure at least one pelvic listing is entered (e.g. PI2EX3), MD is filled in, and a short leg side is selected.</div>
+  <button class="btn-primary" onclick="calculate()">Calculate AD</button>
+
+  <!-- ── RESULTS ── -->
+  <div id="result-section" class="result-section">
+
+    <div class="card">
+      <div class="card-title">Calculated Result</div>
+      <div class="ad-display">
+        <div class="ad-num" id="ad-result-num">—</div>
+        <div class="ad-unit">mm Actual Difference</div>
+      </div>
+      <div id="ad-calc-detail" class="ad-check"></div>
+      <div id="verify-note" class="verify-note"></div>
+      <div id="result-banner" class="result-banner" style="margin-top:14px;">
+        <span class="icon" id="result-icon"></span>
+        <span id="result-text"></span>
+      </div>
+    </div>
+
+    <!-- MATRIX -->
+    <div id="matrix-section" class="card" style="display:none;">
+      <div class="card-title">Utilization Decision Matrix</div>
+
+      <div class="matrix-item">
+        <div class="matrix-chk"><input autocomplete="off" type="checkbox" id="chk1" checked disabled></div>
+        <div class="matrix-text">
+          <strong>X-ray Analysis <span class="auto-badge">Auto ✓</span></strong>
+          <span>MD confirmed radiographically, AD calculated using the 0.4 multiplier</span>
+        </div>
+      </div>
+      <div class="matrix-item">
+        <div class="matrix-chk"><input autocomplete="off" type="checkbox" id="chk2" checked disabled></div>
+        <div class="matrix-text">
+          <strong>Threshold Met <span class="auto-badge">Auto ✓</span></strong>
+          <span>AD &gt; 6mm — required threshold to proceed</span>
+        </div>
+      </div>
+      <div class="matrix-item">
+        <div class="matrix-chk"><input autocomplete="off" type="checkbox" id="chk3"></div>
+        <div class="matrix-text">
+          <strong>Scoliosis Check</strong>
+          <span>Rotatory, single major curve, convex toward the short leg — spinous processes rotated to concavity</span>
+        </div>
+      </div>
+      <div class="matrix-item">
+        <div class="matrix-chk"><input autocomplete="off" type="checkbox" id="chk4"></div>
+        <div class="matrix-text">
+          <strong>Sitting Test</strong>
+          <span>Lumbar curve disappears when patient sits — functional, not idiopathic</span>
+        </div>
+      </div>
+      <div class="matrix-item">
+        <div class="matrix-chk"><input autocomplete="off" type="checkbox" id="chk5" disabled></div>
+        <div class="matrix-text">
+          <strong>Sacral Inferiority <span class="auto-badge">Auto</span></strong>
+          <span id="sacral-matrix-note">Sacrum must be inferior on the same side as the short leg</span>
+        </div>
+      </div>
+      <div class="matrix-item">
+        <div class="matrix-chk"><input autocomplete="off" type="checkbox" id="chk6"></div>
+        <div class="matrix-text">
+          <strong>History — Failed Conservative SI Stabilization</strong>
+          <span>Glute max exercises ineffective; adjustments fail to hold correction</span>
+        </div>
+      </div>
+
+      <button class="btn-secondary" onclick="calcUtil()" style="margin-top:16px;">Utilization Decision</button>
+    </div>
+
+    <!-- UTIL RESULT -->
+    <div id="util-section" class="card" style="display:none;">
+      <div class="card-title">Utilization Outcome</div>
+      <div class="score-bar">
+        <div>
+          <div class="score-fraction" id="score-frac">—</div>
+          <div class="score-sub">criteria met</div>
+        </div>
+        <div class="score-pips" id="score-pips"></div>
+      </div>
+      <div id="util-banner" class="result-banner">
+        <span class="icon" id="util-icon"></span>
+        <span id="util-text"></span>
+      </div>
+      <button class="btn-secondary" id="dosing-btn" onclick="showDosing()" style="display:none;margin-top:4px;">Dosing Principles</button>
+
+      <!-- DOSING -->
+      <div id="dosing-section" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:18px;">
+        <div class="card-title" style="margin-bottom:12px;">Dosing Principles</div>
+        <div class="dosing-grid" id="dosing-grid"></div>
+        <div class="dosing-note" id="dosing-note"></div>
+
+        <!-- PRESCRIBED LIFT -->
+        <div id="prescribed-section" style="margin-top:18px;border-top:1px solid var(--border);padding-top:16px;">
+          <div class="card-title" style="margin-bottom:10px;">Prescribed Heel Lift</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="field-group" style="flex:0 0 140px;">
+              <label class="field-label">Lift Amount</label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input autocomplete="off" type="number" id="prescribed-mm" placeholder="0" min="0" max="50" step="1" oninput="enforceLiftCeiling(this)" style="width:80px;">
+                <span style="font-size:13px;color:var(--text2);">mm</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:160px;">
+              <div class="field-label" style="margin-bottom:5px;">Prescribed For</div>
+              <div id="prescribed-shoe" style="width:100%;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--accent-light);color:var(--accent);letter-spacing:0.2px;">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="save-btn" onclick="saveRecord()" style="display:none;margin-top:4px;background:var(--accent);">Save to Patient Bank</button>
+    <div id="save-msg" style="display:none;margin-top:10px;padding:10px 14px;background:var(--green-light);border:1px solid #a3d9b3;color:var(--green);border-radius:var(--radius-sm);font-size:13px;font-weight:500;">✓ Assessment saved to Patient Bank.</div>
+    <button class="btn-reset" onclick="resetAll()">↺ Start New Assessment</button>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PATIENT BANK TAB
+══════════════════════════════════════════ -->
+<div id="page-patients" class="page">
+
+  <div class="card">
+    <div class="card-title">Patient Bank</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <input autocomplete="off" type="text" id="bank-search" placeholder="Search by name or case number..." oninput="renderBank()"
+        style="flex:1;min-width:180px;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);outline:none;background:var(--surface2);">
+      <button onclick="clearBank()" style="padding:9px 14px;border:1px solid var(--border2);background:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--red);cursor:pointer;">Clear All</button>
+    </div>
+    <div id="bank-list">
+      <div style="text-align:center;color:var(--text3);font-size:13px;padding:32px 0;">No patient data available.</div>
+    </div>
+  </div>
+
+  <!-- PATIENT DETAIL MODAL -->
+  <div id="patient-detail" class="card" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:0;">Patient Record</div>
+      <button onclick="closeDetail()" style="border:none;background:none;font-size:20px;color:var(--text3);cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+
+  <!-- DELETE CONFIRM MODAL -->
+  <div id="delete-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--surface);border-radius:var(--radius);padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:10px;">Delete Record</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:22px;">Are you sure you wish to delete this patient's record? This cannot be undone.</div>
+      <div style="display:flex;gap:10px;">
+        <button id="delete-yes" onclick="confirmDelete()" style="flex:1;padding:11px;background:var(--red);color:white;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Yes, Delete</button>
+        <button onclick="closeDeleteModal()" style="flex:1;padding:11px;background:none;border:1.5px solid var(--border2);color:var(--text2);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;">No, Keep</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     REFERENCE GUIDE TAB
+══════════════════════════════════════════ -->
+<div id="page-info" class="page">
+
+  <div class="card">
+    <div class="card-title">About This Tool</div>
+    <p class="info-p">This clinical decision support tool guides chiropractic interns and clinicians through the complete heel lift utilization assessment — from radiographic MD/AD calculation through the six-point decision matrix and dosing principles. Designed for use at Keagan Devoe (Student Intern).</p>
+  </div>
+
+  <div class="card">
+    <div class="info-h2">MD vs. AD — Core Definitions</div>
+    <div class="info-h3">Measured Difference (MD)</div>
+    <p class="info-p">The raw femur head height difference visible on the AP pelvic radiograph. This is the apparent leg length discrepancy before accounting for pelvic subluxation mechanics — it may be inflated or deflated depending on listing type and side.</p>
+    <div class="info-h3">Actual Difference (AD)</div>
+    <p class="info-p">The true femur height difference after correcting for pelvic subluxation. This is the portion of the leg length discrepancy that chiropractic adjustment alone cannot resolve — the genuine structural anatomical deficit. The AD is calculated by determining how much pelvic listings artificially alter femur head height and removing that contribution from the MD.</p>
+    <div class="formula-box">
+      AD = MD ± (Listing Sum × 0.4)<br>
+      Every 5mm of listing correction = 2mm femur height change<br>
+      Multiplier: 0.4 (always)<br>
+      Round correction to nearest whole mm
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="info-h2">Pelvic Listing Mechanics</div>
+    <div class="info-h3">Why PI is married to EX</div>
+    <p class="info-p">The SI joint does not rotate like a simple hinge — it has an oblique axis running through the auricular surface (the pivot). When the ilium rotates posteriorly around this pivot, the PSIS swings back and down (PI) while the ASIS simultaneously swings forward and up (EX). These motions are mechanically coupled through the auricular surface and cannot occur independently. The auricular surface has an interlocking topography that permits rotation but prevents pure translational sliding.</p>
+    <div class="info-h3">Effect on Femur Head Height</div>
+    <ul class="info-list">
+      <li><strong>PI/Ex listings</strong> artificially <strong>lower</strong> the femur head. Correcting them recovers lost height (raises the femur).</li>
+      <li><strong>AS/In listings</strong> artificially <strong>raise</strong> the femur head. Correcting them removes artificial height (lowers the femur).</li>
+    </ul>
+    <div class="info-h3">Married vs. Unmarried Listings</div>
+    <ul class="info-list">
+      <li><span class="pill pill-blue">Married</span> <strong>PI+EX or AS+IN</strong> — same auricular surface direction → <strong>ADD subscripts</strong></li>
+      <li><span class="pill pill-amber">Unmarried</span> <strong>PI+IN or AS+EX</strong> — opposing forces → <strong>SUBTRACT subscripts</strong></li>
+    </ul>
+    <div class="info-h3">Same Side vs. Opposite Side Listings</div>
+    <ul class="info-list">
+      <li><strong>Listing on SAME side as short leg, PI/Ex:</strong> lowers the already-low femur → correcting raises it → subtract from MD → AD decreases.</li>
+      <li><strong>Listing on SAME side as short leg, AS/In:</strong> raises the already-low femur → correcting lowers it → add to MD → AD increases.</li>
+      <li><strong>Listing on OPPOSITE side (high side), PI/Ex:</strong> lowers the high femur → correcting raises the high side → gap widens → add to MD → AD increases.</li>
+      <li><strong>Listing on OPPOSITE side (high side), AS/In:</strong> raises the high femur → correcting lowers the high side → gap narrows → subtract from MD → AD decreases.</li>
+      <li>If the result is negative, the short leg <strong>flips</strong> to the other side. Take the absolute value.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="info-h2">Utilization Threshold</div>
+    <p class="info-p">Heel lift management is only considered when the <strong>AD &gt; 6mm (or ≥ 7mm)</strong>. An AD at or below 6mm does not warrant a heel lift — chiropractic adjustment alone is sufficient to manage the functional component.</p>
+    <p class="info-p">The AD threshold is a necessary but not sufficient condition. All six utilization criteria must be satisfied before proceeding with lift implementation.</p>
+  </div>
+
+  <div class="card">
+    <div class="info-h2">Six-Point Utilization Decision Matrix</div>
+    <div class="info-h3">1 &amp; 2. X-ray Analysis &amp; Threshold (Auto)</div>
+    <p class="info-p">If the MD is confirmed radiographically, the AD is calculated correctly using the 0.4 multiplier, and AD exceeds 6mm — these first two checkpoints pass automatically. If AD ≤ 6mm, the assessment ends here.</p>
+    <div class="info-h3">3. Scoliosis Check</div>
+    <p class="info-p">The scoliosis must be rotatory (spinous processes rotate toward the concavity), a single major curve, with the convexity on the side of the short leg.</p>
+    <ul class="info-list">
+      <li><span class="pill pill-green">Utilize</span> Rotatory, single major curve, convex toward short leg, spinous processes to concavity</li>
+      <li><span class="pill pill-red">Contraindicated</span> Simple (non-rotatory) scoliosis</li>
+      <li><span class="pill pill-red">Contraindicated</span> Double major curves</li>
+      <li><span class="pill pill-red">Contraindicated</span> No lumbar curve present</li>
+    </ul>
+    <div class="info-h3">4. Sitting Test</div>
+    <p class="info-p">The lumbar curve must disappear when the patient sits. Sitting removes ground-reaction forces and lower extremity influence on the pelvis. Disappears = functional/AO-driven. Persists = idiopathic scoliosis — do not utilize.</p>
+    <div class="info-h3">5. Sacral Inferiority (Auto)</div>
+    <p class="info-p">The sacrum must be inferior on the same side as the short leg. This is auto-populated from your Step 1 entries. If sacrum is level or inferior on the opposite side — do not utilize.</p>
+    <div class="info-h3">6. History — Failed Conservative Stabilization</div>
+    <p class="info-p">The patient must have already failed conservative SI stabilization: gluteus maximus strengthening exercises were ineffective, and chiropractic adjustments correct the subluxation but it returns within days.</p>
+    <p class="info-p" style="margin-top:6px;"><strong>Scoring:</strong> 5 or 6 of 6 criteria = qualify. 4 or fewer = do not qualify.</p>
+  </div>
+
+  <div class="card">
+    <div class="info-h2">Dosing Principles</div>
+    <div class="info-h3">Start Small</div>
+    <p class="info-p">Always begin with the minimum lift amount needed to meet the clinical goal. Compensation is not 1:1 — a 2mm lift may only change sacral inferiority by 1mm.</p>
+    <div class="info-h3">Two Absolute Ceilings</div>
+    <ul class="info-list">
+      <li><strong>Ceiling 1:</strong> Never exceed the AD value.</li>
+      <li><strong>Ceiling 2:</strong> Never exceed the amount needed to level the sacral inferiority.</li>
+    </ul>
+    <div class="info-h3">Full-Time Compliance</div>
+    <p class="info-p">Patient must wear the lift during ALL weight-bearing hours. Partial wear creates compensatory stress on the SI joint and spine.</p>
+    <div class="info-h3">Re-Imaging Protocol</div>
+    <p class="info-p">Re-image at 1 month. Patient must be wearing the lift at time of imaging. Purpose: verify SI joint stabilization and/or lateral curve reduction.</p>
+    <div class="info-h3">Terminology</div>
+    <p class="info-p">We <strong>manage</strong> the deficit — not "treat" with the lift. The lift compensates for a structural reality that adjustment cannot resolve. This distinction is clinically and legally important.</p>
+  </div>
+
+  <div class="card">
+    <div class="info-h2">Measurement Methods</div>
+    <ul class="info-list">
+      <li><span class="pill pill-green">High Accuracy</span> <strong>Plain film radiography</strong> — gold standard for MD/AD. Most accurate and consistent.</li>
+      <li><span class="pill pill-red">Do Not Use</span> <strong>Supine tape measurement</strong> — wildly inaccurate and inconsistent. Never use for MD/AD calculation.</li>
+      <li><span class="pill pill-blue">Diagnostic</span> <strong>Sitting examination</strong> — differentiates AO-driven curves from idiopathic scoliosis. Not used for measurement.</li>
+    </ul>
+    <div class="info-h3">Hyper-Pronation Note</div>
+    <p class="info-p">Correcting hyper-pronation does NOT affect the MD/AD calculation. It pulls the ilia anteriorly, shifting the acetabulum posterior/cephalad. This distortion is already factored out in the MD/AD math.</p>
+  </div>
+
+  <div class="card">
+    <div class="info-h2">SI Joint Stabilization Protocol</div>
+    <p class="info-p">Heel lifts for SI joint stabilization are only indicated after conservative care has failed. Prerequisites before implementing a lift:</p>
+    <ul class="info-list">
+      <li>Gluteus maximus strengthening exercises tried and found ineffective</li>
+      <li>Chiropractic adjustments correct the subluxation but it returns within days</li>
+    </ul>
+    <p class="info-p" style="margin-top:8px;font-style:italic;">We manage the deficit. We do not use lifts as therapy.</p>
+  </div>
+
+</div><!-- end info page -->
+
+<script>
+/* ── TABS ── */
+function showTab(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='patients') renderBank();
+}
+
+
+
+/* ── PARSE LISTING FROM TEXT INPUT ── */
+function parseListing(str){
+  if(!str||str.trim()==='') return null;
+  str=str.trim().toUpperCase();
+  const m=str.match(/^(PI|AS)(\d+)(EX|IN)(\d+)$|^(EX|IN)(\d+)(PI|AS)(\d+)$/);
+  if(!m) return undefined;
+  let rot,trans,s1,s2;
+  if(m[1]){rot=m[1];s1=parseInt(m[2]);trans=m[3];s2=parseInt(m[4]);}
+  else{trans=m[5];s2=parseInt(m[6]);rot=m[7];s1=parseInt(m[8]);}
+  return{rot,trans,s1,s2};
+}
+function getListing(side){
+  const val=document.getElementById(side+'-listing').value.trim();
+  if(val==='') return null;
+  return parseListing(val);
+}
+/* ── LISTING PREVIEW ── */
+function updatePreviewText(side){
+  const val=document.getElementById(side+'-listing').value.trim().toUpperCase();
+  const el=document.getElementById('preview-'+side);
+  if(el){
+    const parsed=parseListing(val);
+    if(parsed){
+      el.textContent=parsed.rot+parsed.s1+parsed.trans+parsed.s2;
+      el.classList.remove('empty');
+    } else {
+      el.textContent='—';
+      el.classList.add('empty');
+    }
+  }
+}
+
+/* ── AUTO-FILL OPPOSITE LISTING ── */
+function flipListing(str){
+  if(!str||str.trim()==='') return '';
+  str=str.trim().toUpperCase();
+  const m=str.match(/^(PI|AS)(\d+)(EX|IN)(\d+)$/);
+  if(!m) return '';
+  const rot=m[1]==='PI'?'AS':'PI';
+  const trans=m[3]==='EX'?'IN':'EX';
+  return rot+m[2]+trans+m[4];
+}
+function autoFillOpposite(changedSide){
+  const changedEl=document.getElementById(changedSide+'-listing');
+  const otherSide=changedSide==='left'?'right':'left';
+  const otherEl=document.getElementById(otherSide+'-listing');
+  const flipped=flipListing(changedEl.value);
+  if(otherEl.value!==flipped){
+    otherEl.value=flipped;
+    updatePreviewText(otherSide);
+  }
+}
+
+
+/* ── CALCULATION ENGINE ── */
+function calcEffect(listing){
+  if(!listing) return null;
+  const {rot,trans,s1,s2}=listing;
+  const married=(rot==='PI'&&trans==='EX')||(rot==='AS'&&trans==='IN');
+  const listingSum=married?(s1+s2):Math.abs(s1-s2);
+  const correction=Math.round(listingSum*0.4);
+  const lowersFemur=(rot==='PI');
+  return{married,listingSum,correction,lowersFemur,rot,trans,s1,s2};
+}
+
+let gAD=0,gShortLeg='';
+
+function enforceLiftCeiling(el){
+  const max=parseFloat(el.max);
+  const val=parseFloat(el.value);
+  if(!isNaN(max)&&!isNaN(val)&&val>max){
+    el.value=max;
+    el.style.borderColor='var(--red)';
+    setTimeout(()=>el.style.borderColor='',1200);
+  }
+}
+
+function checkCaseNumber(){
+  const caseNum = document.getElementById('patient-case').value.trim();
+  const warning = document.getElementById('case-warning');
+  if(!caseNum){ warning.style.display='none'; return; }
+  const currentName = document.getElementById('patient-name').value.trim().toLowerCase();
+  const conflict = patientBank.find(r =>
+    r.caseNum && r.caseNum.trim() === caseNum &&
+    r.name.trim().toLowerCase() !== currentName
+  );
+  warning.style.display = conflict ? 'block' : 'none';
+}
+
+function calculate(){
+  const leftL=getListing('left');
+  const rightL=getListing('right');
+  const md=parseFloat(document.getElementById('md-input').value);
+  const adManual=document.getElementById('ad-input').value;
+  const shortLeg=document.querySelector('input[name="shortleg"]:checked')?.value;
+  const errEl=document.getElementById('error-msg');
+
+  // Validation
+  let err=false;
+  if(leftL===undefined||rightL===undefined) err=true; // bad format
+  if(leftL===null&&rightL===null) err=true; // both empty
+  if(isNaN(md)||md<=0) err=true;
+  if(!shortLeg) err=true;
+
+  if(err){errEl.classList.add('visible');return;}
+  errEl.classList.remove('visible');
+
+  // Calculate
+  let detail='';
+  let totalCorr=0;
+
+  const process=(effect,side)=>{
+    if(!effect) return 0;
+    const type=effect.married?'Married → add':'Unmarried → subtract';
+    const same=(side===shortLeg);
+    let adds=false;
+    if(same){adds=!effect.lowersFemur;}
+    else{adds=effect.lowersFemur;}
+    const label=`${side.charAt(0).toUpperCase()+side.slice(1)}: ${effect.rot}${effect.s1}${effect.trans}${effect.s2}`;
+    const sumLine=effect.married?`${effect.s1}+${effect.s2}=${effect.listingSum}`:`|${effect.s1}-${effect.s2}|=${effect.listingSum}`;
+    detail+=`${label}  (${type}) → sum: ${sumLine} → ${effect.listingSum}×0.4=${(effect.listingSum*0.4).toFixed(1)} → ${effect.correction}mm\n`;
+    detail+=`  ${same?'Same':'Opposite'} side as short leg → correction ${adds?'widens gap (+)':'narrows gap (-)'}: ${adds?'+':'-'}${effect.correction}mm\n`;
+    return adds?effect.correction:-effect.correction;
+  };
+
+  // Only process the listing on the short leg side.
+  // The opposite listing is the biomechanical mirror — processing both would double-count.
+  const relevantListing = shortLeg==='left' ? leftL : rightL;
+  const relevantEff=calcEffect(relevantListing);
+  totalCorr+=process(relevantEff, shortLeg);
+
+  let adRaw=md+totalCorr;
+  let finalShortLeg=shortLeg;
+  // If correction exceeds MD, the listing fully accounts for the apparent discrepancy.
+  // AD is 0 — the short leg side does not change.
+  if(adRaw<0){ adRaw=0; }
+  const ad=Math.round(adRaw);
+  detail+=`AD = ${md} + (${totalCorr}) = ${ad}mm (${finalShortLeg} side)`;
+
+  gAD=ad; gShortLeg=finalShortLeg;
+
+  document.getElementById('ad-result-num').textContent=ad;
+  document.getElementById('ad-calc-detail').textContent=detail||`MD = ${md}mm, no listings entered → AD = ${ad}mm`;
+
+  // Verify
+  const noteEl=document.getElementById('verify-note');
+  if(adManual!==''){
+    const m=parseFloat(adManual);
+    if(!isNaN(m)){
+      const diff=Math.abs(m-ad);
+      if(diff===0){noteEl.style.color='var(--green)';noteEl.textContent='✓ Charted AD matches calculated AD.';}
+      else{noteEl.style.color='var(--red)';noteEl.textContent=`⚠ Charted AD (${m}mm) differs from calculated AD (${ad}mm) by ${diff}mm — verify inputs.`;}
+    }
+  } else {noteEl.textContent='';}
+
+  // Banner
+  const banner=document.getElementById('result-banner');
+  if(ad>6){
+    banner.className='result-banner green';
+    document.getElementById('result-icon').textContent='✓';
+    document.getElementById('result-text').textContent=`AD is ${ad}mm — exceeds 6mm threshold. Patient could qualify for heel lift management depending on the following criteria:`;
+    document.getElementById('matrix-section').style.display='block';
+    autoSacral();
+  } else {
+    banner.className='result-banner red';
+    document.getElementById('result-icon').textContent='✗';
+    document.getElementById('result-text').textContent=`AD is ${ad}mm — below 6mm threshold. Patient does not qualify for heel lift management.`;
+    document.getElementById('matrix-section').style.display='none';
+    document.getElementById('save-btn').style.display='block';
+  }
+
+  document.getElementById('util-section').style.display='none';
+  document.getElementById('result-section').classList.add('visible');
+  setTimeout(()=>document.getElementById('result-section').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+function autoSacral(){
+  const sacralSide=document.querySelector('input[name="sacral"]:checked')?.value;
+  const chk=document.getElementById('chk5');
+  const note=document.getElementById('sacral-matrix-note');
+  if(!sacralSide){
+    chk.checked=false;
+    note.textContent='Sacral inferiority side not entered in Step 1 — criterion not met.';
+    note.style.color='';
+    return;
+  }
+  if(sacralSide===gShortLeg){
+    chk.checked=true;
+    note.textContent=`Sacrum inferior on ${sacralSide} side — matches short leg (${gShortLeg}). ✓`;
+    note.style.color='var(--green)';
+  } else {
+    chk.checked=false;
+    note.textContent=`Sacrum inferior on ${sacralSide} side — opposite to short leg (${gShortLeg}). ✗`;
+    note.style.color='var(--red)';
+  }
+}
+
+function calcUtil(){
+  const checks=[
+    document.getElementById('chk1').checked,
+    document.getElementById('chk2').checked,
+    document.getElementById('chk3').checked,
+    document.getElementById('chk4').checked,
+    document.getElementById('chk5').checked,
+    document.getElementById('chk6').checked,
+  ];
+  const total=checks.filter(Boolean).length;
+
+  document.getElementById('score-frac').textContent=`${total}/6`;
+  const pipsEl=document.getElementById('score-pips');
+  pipsEl.innerHTML='';
+  checks.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='pip '+(c?'on':'off');
+    pipsEl.appendChild(d);
+  });
+
+  const banner=document.getElementById('util-banner');
+  const dosingBtn=document.getElementById('dosing-btn');
+  if(total>=5){
+    banner.className='result-banner green';
+    document.getElementById('util-icon').textContent='✓';
+    document.getElementById('util-text').textContent=`${total}/6 criteria met — patient qualifies for heel lift management. Proceed to dosing principles.`;
+    dosingBtn.style.display='block';
+  } else {
+    banner.className='result-banner red';
+    document.getElementById('util-icon').textContent='✗';
+    document.getElementById('util-text').textContent=`${total}/6 criteria met — patient does NOT qualify for heel lift management. Minimum 5/6 required.`;
+    dosingBtn.style.display='none';
+    document.getElementById('dosing-section').style.display='none';
+  }
+
+  document.getElementById('util-section').style.display='block';
+  document.getElementById('save-btn').style.display='block';
+  setTimeout(()=>document.getElementById('util-section').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+function showDosing(){
+  const sacralMM=parseFloat(document.getElementById('sacral-mm').value);
+  const ceiling=(!isNaN(sacralMM)&&sacralMM>0)?sacralMM:null;
+  const start=ceiling!=null?Math.max(1,Math.round(ceiling*0.25)):1;
+
+  // Set max on the prescribed-mm input to enforce ceiling
+  const prescribedInput=document.getElementById('prescribed-mm');
+  if(ceiling!=null){
+    prescribedInput.max=ceiling;
+    prescribedInput.title=`Maximum lift is ${ceiling}mm (sacral inferiority ceiling)`;
+  } else {
+    prescribedInput.removeAttribute('max');
+    prescribedInput.title='';
+  }
+
+  const grid=document.getElementById('dosing-grid');
+  grid.innerHTML='';
+  const items=[
+    {label:'Ceiling (Sacral Inferiority)',val:ceiling!=null?`${ceiling}mm`:'Not entered',cls:'warn',sub:'Maximum lift — never exceed this'},
+    {label:'Recommended Start',val:ceiling!=null?`${start}mm`:'—',cls:'ok',sub:'Minimum to meet the goal'},
+    {label:'Compliance',val:'Full-time',cls:'',sub:'All weight-bearing hours'},
+    {label:'Re-image At',val:'1 Month',cls:'',sub:'Patient wearing the lift'},
+  ];
+  items.forEach(it=>{
+    const d=document.createElement('div');
+    d.className=`dosing-item ${it.cls}`;
+    d.innerHTML=`<label>${it.label}</label><div class="dval">${it.val}</div><div class="dsub">${it.sub}</div>`;
+    grid.appendChild(d);
+  });
+
+  const note=document.getElementById('dosing-note');
+  const ceilMsg=ceiling!=null
+    ?`The sacral inferiority ceiling is ${ceiling}mm — this is the maximum lift that may be prescribed.`
+    :`Sacral inferiority was not entered in Step 1. Ensure this measurement is recorded before prescribing a lift amount.`;
+  note.innerHTML=`<strong>Clinical note:</strong> We <em>manage</em> the anatomical deficit — this is not therapy. Compensation is not 1:1: a 2mm lift may only change sacral inferiority by 1mm. ${ceilMsg} Begin at ${start}mm and titrate progressively as verified by re-imaging at 1 month. Patient must wear the lift during ALL weight-bearing hours — partial wear creates compensatory stress.`;
+
+  // Auto-fill shoe side from short leg selection
+  const shoeSide = gShortLeg ? gShortLeg.charAt(0).toUpperCase()+gShortLeg.slice(1)+' Shoe' : '—';
+  document.getElementById('prescribed-shoe').textContent = shoeSide;
+
+  document.getElementById('dosing-section').style.display='block';
+  document.getElementById('dosing-btn').style.display='none';
+  setTimeout(()=>document.getElementById('dosing-section').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+function resetAll(){
+  document.getElementById('left-listing').value='';
+  document.getElementById('right-listing').value='';
+  document.getElementById('md-input').value='';
+  document.getElementById('ad-input').value='';
+  document.getElementById('sacral-mm').value='';
+  document.querySelectorAll('input[name="shortleg"],input[name="sacral"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('#chk3,#chk4,#chk6').forEach(c=>c.checked=false);
+  document.getElementById('result-section').classList.remove('visible');
+  document.getElementById('matrix-section').style.display='none';
+  document.getElementById('util-section').style.display='none';
+  document.getElementById('error-msg').classList.remove('visible');
+  document.getElementById('verify-note').textContent='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('save-btn').style.display='none';
+  document.getElementById('case-warning').style.display='none';
+  document.getElementById('save-msg').style.display='none';
+  document.getElementById('prescribed-mm').value='';
+  document.getElementById('prescribed-shoe').textContent='—';
+  updatePreviewText('left');
+  updatePreviewText('right');
+}
+
+
+/* ════════════════════════════════
+   PATIENT BANK
+════════════════════════════════ */
+let patientBank = [];
+try { patientBank = JSON.parse(localStorage.getItem('heelLiftBank') || '[]'); } catch(e) {}
+
+function saveBank(){
+  try { localStorage.setItem('heelLiftBank', JSON.stringify(patientBank)); } catch(e) {}
+}
+
+function saveRecord(){
+  const name = document.getElementById('patient-name').value.trim();
+  const caseNum = document.getElementById('patient-case').value.trim();
+  if(!name){
+    alert('Please enter a patient name before saving.');
+    document.getElementById('patient-name').focus();
+    return;
+  }
+  if(gAD === 0 && document.getElementById('ad-result-num').textContent === '—'){
+    alert('Please complete the assessment (tap Calculate) before saving.');
+    return;
+  }
+
+  const prescribedMM = document.getElementById('prescribed-mm').value;
+  const prescribedNotes = document.getElementById('prescribed-shoe').textContent.trim();
+
+  // Gather matrix state
+  const chkLabels = [
+    'X-ray Analysis','Threshold Met','Scoliosis Check',
+    'Sitting Test','Sacral Inferiority','Conservative SI Stabilization'
+  ];
+  const chkVals = [1,2,3,4,5,6].map(n => document.getElementById('chk'+n)?.checked || false);
+  const criteria = chkLabels.map((l,i)=>({label:l,passed:chkVals[i]}));
+  const critScore = chkVals.filter(Boolean).length;
+
+  // Determine outcome
+  const adVal = parseInt(document.getElementById('ad-result-num').textContent) || 0;
+  let outcome = 'pending';
+  if(adVal <= 6) outcome = 'no-threshold';
+  else if(document.getElementById('util-section')?.style.display !== 'none'){
+    outcome = critScore >= 5 ? 'qualifies' : 'does-not-qualify';
+  }
+
+  const record = {
+    id: Date.now(),
+    name,
+    caseNum,
+    date: new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
+    leftListing: document.getElementById('left-listing').value.trim(),
+    rightListing: document.getElementById('right-listing').value.trim(),
+    md: document.getElementById('md-input').value,
+    ad: adVal,
+    shortLeg: document.querySelector('input[name="shortleg"]:checked')?.value || '—',
+    sacralSide: document.querySelector('input[name="sacral"]:checked')?.value || '—',
+    sacralMM: document.getElementById('sacral-mm').value || '—',
+    calcDetail: document.getElementById('ad-calc-detail').textContent,
+    criteria,
+    critScore,
+    outcome,
+    prescribedMM: prescribedMM || null,
+    prescribedNotes: prescribedNotes || null,
+  };
+
+  // Update if same patient name+case exists today, else push
+  const today = record.date;
+  const existing = patientBank.findIndex(r => r.name.toLowerCase()===name.toLowerCase() && r.caseNum===caseNum && r.date===today);
+  if(existing >= 0) patientBank[existing] = record;
+  else patientBank.unshift(record);
+
+  saveBank();
+  renderBank();
+
+  const msg = document.getElementById('save-msg');
+  msg.style.display = 'block';
+  setTimeout(()=>msg.style.display='none', 3000);
+}
+
+function initials(name){
+  return name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+}
+
+function outcomeLabel(outcome){
+  if(outcome==='qualifies') return '<span class="bank-row-badge badge-qualify">Qualifies</span>';
+  if(outcome==='does-not-qualify') return '<span class="bank-row-badge badge-no">Does Not Qualify</span>';
+  if(outcome==='no-threshold') return '<span class="bank-row-badge badge-no">Below Threshold</span>';
+  return '<span class="bank-row-badge badge-pending">Partial</span>';
+}
+
+function renderBank(){
+  const q = document.getElementById('bank-search')?.value.toLowerCase() || '';
+  const list = document.getElementById('bank-list');
+  if(!list) return;
+  const filtered = patientBank.filter(r =>
+    r.name.toLowerCase().includes(q) ||
+    (r.caseNum && r.caseNum.toLowerCase().includes(q))
+  );
+  if(filtered.length === 0){
+    list.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:32px 0;">No patient data available.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(r => `
+    <div class="bank-row" onclick="openDetail(${r.id})">
+      <div class="bank-row-avatar">${initials(r.name)}</div>
+      <div class="bank-row-info">
+        <div class="bank-row-name">${r.name}${r.caseNum ? ' <span style="font-weight:400;color:var(--text3);">#'+r.caseNum+'</span>' : ''}</div>
+        <div class="bank-row-meta">${r.date} · AD ${r.ad}mm · ${r.shortLeg} short leg</div>
+      </div>
+      ${outcomeLabel(r.outcome)}
+    </div>
+  `).join('');
+}
+
+function openDetail(id){
+  const r = patientBank.find(p=>p.id===id);
+  if(!r) return;
+  const det = document.getElementById('patient-detail');
+  const content = document.getElementById('detail-content');
+
+  const outcomeColor = r.outcome==='qualifies'?'var(--green)':r.outcome==='pending'?'var(--amber)':'var(--red)';
+  const outcomeText = r.outcome==='qualifies'?'Qualifies for heel lift management':
+    r.outcome==='does-not-qualify'?'Does NOT qualify for heel lift management':
+    r.outcome==='no-threshold'?'AD below 6mm threshold — does not qualify':'Assessment incomplete';
+
+  const criteriaRows = r.criteria.map(c=>`
+    <div class="detail-row">
+      <span class="detail-label">${c.label}</span>
+      <span style="color:${c.passed?'var(--green)':'var(--red)'};font-size:13px;">${c.passed?'✓ Pass':'✗ Fail'}</span>
+    </div>`).join('');
+
+  const liftSection = r.prescribedMM ? `
+    <div class="detail-section">
+      <div class="detail-section-title">Prescribed Heel Lift</div>
+      <div class="lift-badge">⬆ ${r.prescribedMM}mm</div>
+      ${r.prescribedNotes ? `<div style="font-size:13px;color:var(--text2);margin-top:8px;">${r.prescribedNotes}</div>` : ''}
+    </div>` : '';
+
+  content.innerHTML = `
+    <div class="detail-row"><span class="detail-label">Patient</span><span class="detail-val">${r.name}</span></div>
+    ${r.caseNum ? `<div class="detail-row"><span class="detail-label">Case #</span><span class="detail-val">${r.caseNum}</span></div>` : ''}
+    <div class="detail-row"><span class="detail-label">Assessment Date</span><span class="detail-val">${r.date}</span></div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Radiographic Data</div>
+      <div class="detail-row"><span class="detail-label">Left Listing</span><span class="detail-val">${r.leftListing||'—'}</span></div>
+      <div class="detail-row"><span class="detail-label">Right Listing</span><span class="detail-val">${r.rightListing||'—'}</span></div>
+      <div class="detail-row"><span class="detail-label">MD</span><span class="detail-val">${r.md}mm</span></div>
+      <div class="detail-row"><span class="detail-label">AD (Calculated)</span><span class="detail-val">${r.ad}mm</span></div>
+      <div class="detail-row"><span class="detail-label">Short Leg Side</span><span class="detail-val">${r.shortLeg}</span></div>
+      <div class="detail-row"><span class="detail-label">Sacral Inferiority</span><span class="detail-val">${r.sacralSide} / ${r.sacralMM}mm</span></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Utilization Criteria (${r.critScore}/6)</div>
+      ${criteriaRows}
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Outcome</div>
+      <div style="font-size:14px;font-weight:600;color:${outcomeColor};padding:10px 14px;background:${r.outcome==='qualifies'?'var(--green-light)':'var(--red-light)'};border-radius:var(--radius-sm);">${outcomeText}</div>
+    </div>
+
+    ${liftSection}
+
+    <div style="margin-top:16px;display:flex;gap:10px;">
+      <button onclick="deleteRecord(${r.id})" style="flex:1;padding:10px;border:1px solid var(--red);background:none;color:var(--red);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Delete Record</button>
+      <button onclick="closeDetail()" style="flex:1;padding:10px;border:1px solid var(--border2);background:none;color:var(--text2);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Close</button>
+    </div>
+  `;
+
+  det.style.display = 'block';
+  det.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeDetail(){
+  document.getElementById('patient-detail').style.display = 'none';
+}
+
+let _pendingDeleteId = null;
+
+function deleteRecord(id){
+  _pendingDeleteId = id;
+  const modal = document.getElementById('delete-modal');
+  modal.style.display = 'flex';
+}
+
+function closeDeleteModal(){
+  _pendingDeleteId = null;
+  document.getElementById('delete-modal').style.display = 'none';
+}
+
+function confirmDelete(){
+  if(_pendingDeleteId===null) return;
+  patientBank = patientBank.filter(r=>r.id!==_pendingDeleteId);
+  saveBank();
+  closeDeleteModal();
+  closeDetail();
+  renderBank();
+}
+
+function clearBank(){
+  if(!confirm('Delete ALL patient records? This cannot be undone.')) return;
+  patientBank = [];
+  saveBank();
+  closeDetail();
+  renderBank();
+}
+
+/* Re-render bank when switching to patients tab */
+
+
+
+/* Init */
+document.addEventListener('DOMContentLoaded', function(){
+  renderBank();
+});
+</script>
+</body>
+</html>
